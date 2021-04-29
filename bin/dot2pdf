@@ -1,0 +1,5 @@
+# A script for generating pdf files from the dot files
+echo "Generating pdf files..."
+# dot -Tpdf ../out/ImpModel.dot -o ../out/ImpModel.pdf
+# dot -Tpdf ../out/SpecModel.dot -o ../out/SpecModel.pdf
+dot -Tpdf ../out/GameGraph.dot -o ../out/GameGraph.pdf

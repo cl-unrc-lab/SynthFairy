@@ -10,8 +10,7 @@ Clean:
 $ ant clean
 
 Run:
-$ cd bin
-$ ./synthFairy <options> <model path>. 
+$ ./bin/synthFairy <options> <model path>. 
 
 Options:
     -d : create dot file

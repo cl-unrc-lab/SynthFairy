@@ -1,0 +1,643 @@
+package parserProgram;
+
+import java_cup.runtime.*;
+import lang.*;
+import java.util.*;
+
+parser code {:
+	
+    public void syntax_error(Symbol s){
+        System.err.println("\n\nSyntax Error - line: " +  (s.left+1) +  " - value:" + s.value);
+        
+    }
+
+
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception {    
+         System.err.println("\n\nUnrecovered Syntax error line: " +  (s.left+1) +  " - value:" + s.value);
+    }
+                                 	
+:}
+
+
+
+terminal PLUS;
+terminal PLUSPLUS;
+terminal MINUS;
+terminal ASTERISK;
+terminal SLASH;
+terminal EXCLAMATION;
+terminal LPARENT;
+terminal RPARENT;
+terminal LBRACE;
+terminal RBRACE;
+terminal LBRACKET;
+terminal RBRACKET;
+terminal SEMICOLON;
+terminal COLON;
+terminal RIGHTARROW;
+terminal EQUAL;
+terminal DOUBLE_EQUAL;
+terminal COMMA;
+terminal OR;
+terminal AND;
+terminal GT;
+terminal LT;
+terminal GEQ;
+terminal LEQ;
+terminal INT;
+terminal BOOL;
+terminal INIT;
+terminal PROCESS;
+terminal RUN;
+terminal MAIN;
+terminal GLOBAL;
+terminal ENUM;
+terminal REWARDS;
+terminal CONTROLLER;
+terminal GOAL;
+
+
+terminal Integer INTEGER;
+terminal Double DOUBLE;
+terminal TRUE,FALSE;
+terminal String ID;
+terminal String FAULTY,INTERNAL;         
+                
+                
+
+
+non terminal Expression primary, expr, disjunction, conjunction, relation, comparison, addition, term, factor;
+non terminal Code assignation;
+non terminal LinkedList<Code> assigList;
+non terminal Branch branch;
+non terminal LinkedList<Branch> branchList;
+non terminal Expression initialCond, controllerCond, goalCond;
+non terminal LinkedList<Var> declList;
+non terminal LinkedList<Var> decl;
+non terminal LinkedList<String> varDecls;
+non terminal Proc process, bodyProcess;
+non terminal LinkedList<Param> paramList;
+non terminal Param param;
+non terminal ProcessCollection processList;
+non terminal LinkedList<Var> globalDecl;
+non terminal GlobalVarCollection globalVarList;
+non terminal Program specification;
+non terminal LinkedList<InvkProcess> processInvk;
+non terminal InvkProcess invk;
+non terminal LinkedList<ProcessDecl> proc, processDecl;
+non terminal Main program, body;
+non terminal Type type;
+non terminal Program mainSpecification;
+non terminal LinkedList<Expression> invkParamList;
+non terminal Expression invkParam;
+non terminal LinkedList<String> constantDecls;
+non terminal EnumType enumDecl;
+non terminal LinkedList<EnumType> enumList;
+non terminal String label;
+non terminal Boolean faulty;
+non terminal Boolean internal;
+non terminal Code assignationProb;
+non terminal LinkedList<Code> assigListProb;
+non terminal Integer actionReward;
+non terminal LinkedList<Reward> rewardList;
+
+
+precedence left GT,LT,GEQ,LEQ,DOUBLE_EQUAL,AND,OR;
+precedence left PLUS, MINUS;
+precedence left ASTERISK, SLASH;
+precedence left LPARENT, RPARENT;
+precedence left EXCLAMATION;
+
+
+start with mainSpecification;
+
+mainSpecification ::= specification:prog {: RESULT = prog;
+                                         :}
+                    ;
+
+specification ::=  enumList:eList SEMICOLON globalVarList:vList SEMICOLON  processList:pList program:main  
+                                                                                                {: // EnumTypes + GlobalVars
+                                                                                                   Program prog = new Program(eList,vList,pList, main);
+                                                                                                   RESULT = prog;
+                                                                                                :}
+                  
+                  | globalVarList:vList SEMICOLON  processList:pList program:main  
+                                                                                 {: // GlobalVars
+                                                                                    Program prog = new Program(vList,pList, main);
+                                                                                    RESULT = prog;
+                                                                                 :}
+                  
+                  |  enumList:eList SEMICOLON processList:pList program:main  
+                                                                    {:  // EnumTypes
+                                                                        Program prog = new Program(eList, pList, main);
+                                                                        RESULT = prog;
+                                                                    :}
+                                                                
+                  |  processList:pList program:main  {:  // not EnumTypes & not GlobalVars 
+                                                         Program prog = new Program(pList, main);
+                                                         RESULT = prog;
+                                                     :}
+               ;
+
+enumList::=   enumDecl:enumT  {: LinkedList<EnumType> listE = new LinkedList<EnumType>();
+                                 listE.add(enumT);
+                                 RESULT = listE;  
+                              :}
+              | enumList:listE SEMICOLON  enumDecl:enumT  {: listE.add(enumT);
+                                                            RESULT = listE;
+                                                         :}
+              ;
+
+
+ 
+enumDecl ::= ENUM ID:name EQUAL LBRACE constantDecls:constList RBRACE {: EnumType  enumT = new EnumType(name, constList.size() );
+                                                                         for (int i = 0; i < constList.size(); i++){
+                                                                              enumT.addCons(constList.get(i),i);
+                                                                         }
+                                                                         RESULT = enumT;
+                                                                      :}
+          ;
+
+
+constantDecls ::=  ID:i  {:  LinkedList<String> list = new LinkedList<String>();
+                             list.add(i);
+                             RESULT = list; 
+                         :}      
+            | constantDecls:list COMMA ID:i {: list.add(i);
+                                               RESULT = list;
+                                            :}
+
+                ;
+
+globalVarList ::=  globalDecl:listD {:  
+                                         GlobalVarCollection list = new GlobalVarCollection();
+                                         Var var;
+                                         for (int i = 0; i < listD.size(); i++){
+                                            var = listD.get(i);
+                                            if(var.getType().isInt()){
+                                                list.addGlobalIntVar(var);
+                                            }
+                                            else{
+                                                if(var.getType().isBoolean()){
+                                                    list.addGlobalBoolVar(var);
+                                                }
+                                                else{
+                                                    list.addGlobalEnumVar(var);
+                                                }
+                                            }
+                                         }
+                                         RESULT = list; 
+                                     :}  
+                | globalVarList:list SEMICOLON globalDecl:listD  {: Var var;
+                                                                    for (int i = 0; i < listD.size(); i++){
+                                                                       var = listD.get(i);
+                                                                       if(var.getType().isInt()){
+                                                                           list.addGlobalIntVar(var);
+                                                                       }
+                                                                       else{
+                                                                           if(var.getType().isBoolean()){
+                                                                               list.addGlobalBoolVar(var);
+                                                                           }
+                                                                           else{
+                                                                               list.addGlobalEnumVar(var);
+                                                                           }
+                                                                       }
+                                                                    }
+                                                                    RESULT = list;
+                                                                  :}
+            
+            ;
+    
+                
+globalDecl ::= GLOBAL varDecls:listNames COLON type:t {:  LinkedList<Var> list = new LinkedList<Var>();
+                                                          Var v;
+                                             
+                                                          if ( t.isInt() ){
+                                                             for (int i = 0; i < listNames.size(); i++){
+                                                                 v = new Var(listNames.get(i), Type.INT);
+                                                                 list.add(v);
+                                                             }
+                                                          }
+                                                          else{
+                                                              if ( t.isBoolean() ){
+                                                                  for (int i = 0; i < listNames.size(); i++){
+                                                                     v = new Var(listNames.get(i), Type.BOOL);
+                                                                     list.add(v);
+                                                                  }
+                                                              }
+                                                              else{
+                                                                  for (int i = 0; i < listNames.size(); i++){
+                                                                     v = new Var(listNames.get(i), t);
+                                                                     list.add(v);
+                                                                  }
+
+                                                              }
+                                                          }
+
+        	                                           RESULT = list;
+                                                      :}
+       ;
+
+
+
+
+processList  ::= process:p  {: 
+                                  ProcessCollection list = new ProcessCollection();
+                                  list.addProcess(p);
+                                  RESULT = list; 
+                            :}
+
+              | processList:list process:p  {: list.addProcess(p);
+                                               RESULT = list; 
+                                            :}
+              ;
+
+process ::= PROCESS ID:name bodyProcess:proc {: proc.setName(name);
+                                                                                     RESULT = proc;  
+                                                                                  :}
+           | PROCESS ID:name LPARENT paramList:listP RPARENT bodyProcess:proc {: proc.setName(name);
+                                                                                                     proc.setParamList(listP);
+                                                                                                     RESULT = proc;
+                                                                                                  :}
+
+           ;
+
+paramList ::= param:p {:
+                             LinkedList<Param> list = new LinkedList<Param>();
+                             list.add(p);
+                             RESULT = list; 
+                      :}  
+            | paramList:list COMMA param:p  {:  
+                                                list.add(p);
+                                                RESULT = list;
+                                            :}
+            
+            ;
+    
+                
+param ::= ID:name COLON type:t {:  Param p;
+                                             
+                                   if ( t.isInt() ){
+                                      p = new Param(name, Type.INT);
+                                                  
+                                   }
+                                   else{
+                                      if ( t.isBoolean() ){
+                                          p = new Param(name, Type.BOOL);
+                                      }
+                                      else{
+                                         p = new Param(name, t);
+                                      }
+                                   }
+                                                    
+                                   RESULT = p;
+                               :}
+       ;
+
+
+
+
+
+bodyProcess::= LBRACE declList:listD SEMICOLON initialCond:init SEMICOLON  branchList:listB SEMICOLON RBRACE {: Proc proc = new Proc(init,listD,listB);
+                                                                                                                                         RESULT = proc;
+                                                                                                                                          
+                                                                                                                                      :}
+          
+             | LBRACE initialCond:init SEMICOLON branchList:listB SEMICOLON RBRACE {: Proc proc = new Proc(init,listB);
+                                                                                                                                         RESULT = proc;
+                                                                                                                                          
+                                                                                                                                      :}
+             | LBRACE declList:listD  SEMICOLON REWARDS COLON rewardList:listR SEMICOLON controllerCond:ctrl SEMICOLON goalCond:goal SEMICOLON initialCond:init SEMICOLON  branchList:listB SEMICOLON RBRACE {: Proc proc = new Proc(init,listD,listB,listR,ctrl,goal);
+                                                                                                                                         RESULT = proc;
+                                                                                                                                          
+                                                                                                                                      :}
+          
+             | LBRACE REWARDS COLON rewardList:listR SEMICOLON controllerCond:ctrl SEMICOLON goalCond:goal SEMICOLON initialCond:init SEMICOLON branchList:listB SEMICOLON RBRACE {: Proc proc = new Proc(init,listB,listR,ctrl,goal);
+                                                                                                                                         RESULT = proc;
+                                                                                                                                          
+                                                                                                                                      :}                 
+          ;                
+
+initialCond ::= INIT COLON expr:e {: RESULT = e;  :} 
+              ;
+
+controllerCond ::= CONTROLLER COLON expr:e {: RESULT = e;  :} 
+              ;
+
+goalCond ::= GOAL COLON expr:e {: RESULT = e;  :} 
+              ;
+
+
+rewardList ::= expr:e COLON INTEGER:i {: Reward r = new Reward(e,i); 
+                                        LinkedList<Reward> list = new LinkedList<Reward>();
+                                        list.add(r);
+                                        RESULT = list;
+                                      :}
+            | rewardList:list COMMA expr:e COLON INTEGER:i {: Reward r = new Reward(e,i); 
+                                                            list.add(r);
+                                                            RESULT = list;
+                                                        :}
+            ;
+declList ::= decl:listD {:  
+                             LinkedList<Var> list = new LinkedList<Var>();
+                             for (int i = 0; i < listD.size(); i++){
+        	                    list.add(listD.get(i));
+                             }
+                             RESULT = list; 
+                        :}  
+            | declList:list SEMICOLON decl:listD  {: for (int i = 0; i < listD.size(); i++){
+        	                                            list.add(listD.get(i));
+                                                     }
+                                                     RESULT = list;
+                                                  :}
+            
+            ;
+    
+                
+decl ::= varDecls:listNames COLON type:t {:  LinkedList<Var> list = new LinkedList<Var>();
+                                             Var v;
+                                             
+                                             if ( t.isInt() ){
+                                                
+                                                 for (int i = 0; i < listNames.size(); i++){
+                                                    v = new Var(listNames.get(i), Type.INT);
+                                                    list.add(v);
+                                                  }
+                                              }
+                                              else{
+                                                 if ( t.isBoolean() ){
+                                                 
+                                                    for (int i = 0; i < listNames.size(); i++){
+                                                        v = new Var(listNames.get(i), Type.BOOL);
+                                                        list.add(v);
+                                                     }
+                                                  }
+                                                  else{
+                                                     for (int i = 0; i < listNames.size(); i++){
+                                                        v = new Var(listNames.get(i), t ); // Enumerated!
+                                                        list.add(v);
+                                                     }
+
+                                                  }
+                                              }
+        	                                    
+                                              
+                                              RESULT = list;
+                                          :}
+       ;
+
+
+varDecls ::= ID:i  {:  LinkedList<String> list = new LinkedList<String>();
+                       list.add(i);
+                       RESULT = list; 
+                  :}      
+            | varDecls:list COMMA ID:i {: list.add(i);
+                                          RESULT = list;
+                                       :}
+            ; 
+
+
+type ::=   INT    {: RESULT = Type.INT; :}
+         | BOOL   {: RESULT = Type.BOOL; :}
+         | ID:name  {: Type t = Type.ENUMERATED;
+                       t.setStringValue(name);
+                       RESULT = t; 
+                    :}
+         ;
+            
+            
+branchList ::= branch:b  {:  LinkedList<Branch> list = new LinkedList<Branch>();
+                             list.add(b);
+                             RESULT = list; 
+                         :}      
+               | branchList:list SEMICOLON branch:b {: list.add(b);
+                                                       RESULT = list;
+                                                    :}
+               ; 
+
+branch ::=  label:l actionReward:r faulty:f internal:i  expr:e  RIGHTARROW assigListProb:list {:  // Probabilistic branch
+                                                  Branch b = new Branch(e,list,f,i,l,r,true);
+                                                  RESULT = b;
+                                             :}
+            | label:l actionReward:r faulty:f internal:i expr:e  RIGHTARROW assigList:list {: 
+                                                  Branch b = new Branch(e,list,f,i,l,r,false);
+                                                  RESULT = b;
+                                             :}
+        ;
+
+label ::= LBRACKET ID:id RBRACKET {: RESULT = id; :}
+        ;
+
+faulty ::= FAULTY {: RESULT = true; :}
+        | {: RESULT = false; :}
+        ;
+
+internal ::= INTERNAL {: RESULT = true; :}
+        | {: RESULT = false; :}
+        ;
+
+actionReward ::= LT INTEGER:i GT {: RESULT = i; :}
+        | {: RESULT = 0; :}
+        ;
+
+assigListProb ::= assignationProb:pa {: LinkedList<Code> list = new LinkedList<Code>();
+                                                          list.add(pa);
+                                                           RESULT = list;
+                                                        :}
+                | assigListProb:list PLUSPLUS assignationProb:pa {: list.add(pa);
+                                                          RESULT = list;
+                                                       :}    
+               ;
+
+assignationProb ::=  DOUBLE:p COLON assigList:l {:
+                                                    RESULT = new ProbAssign(p,l);
+                                                :} 
+                ;
+assigList ::=  assignation:assign {: LinkedList<Code> list = new LinkedList<Code>();
+                                     list.add(assign);
+                                     RESULT = list; 
+                                  :}
+             | assigList:list COMMA assignation:assign {: list.add(assign);
+                                                          RESULT = list;
+                                                       :}
+             ; 
+            
+                            
+assignation ::= ID:i EQUAL expr:value {:   
+                                           Var var = new Var(i);
+                                           RESULT = new VarAssign(var,value);
+                                      :}
+              ;  
+
+                      
+ 
+                                            
+expr ::= disjunction :val {:  RESULT = val; :}
+       ;
+
+disjunction ::= conjunction:val {: RESULT = val; :}
+              | disjunction:op1 OR conjunction:op2 {: OrBoolExp expr = new OrBoolExp(op1,op2); 
+                                                      RESULT = expr;
+                                                   :} 
+              ;         
+                
+conjunction  ::= comparison:val {:  RESULT = val; :}
+              | conjunction:op1 AND comparison:op2 {: AndBoolExp expr = new AndBoolExp(op1,op2); 
+                                                      RESULT = expr;
+                                                   :}
+              ;                 
+
+comparison ::= relation:val {:  RESULT = val; :}
+              | relation:op1 DOUBLE_EQUAL relation:op2  {: EqBoolExp expr = new EqBoolExp(op1,op2); 
+                                                           RESULT = expr;
+                                                        :}
+              ;
+                      
+relation    ::= addition:val {:  RESULT = val; :}
+              | addition:op1 LT addition:op2 {: LessBoolExp expr = new LessBoolExp(op1,op2); 
+                                                RESULT = expr;
+                                             :}
+              | addition:op1 GT addition:op2 {: GreaterBoolExp expr = new GreaterBoolExp(op1,op2); 
+                                                RESULT = expr;
+                                             :}
+              | addition:op1 GEQ addition:op2 {: GreaterOrEqualBoolExp expr = new GreaterOrEqualBoolExp(op1,op2); 
+                                                RESULT = expr;
+                                             :}
+              | addition:op1 LEQ addition:op2 {: LessOrEqualBoolExp expr = new LessOrEqualBoolExp(op1,op2); 
+                                                RESULT = expr;
+                                             :}
+              ; 
+                
+addition        ::= term:val{:  RESULT = val; :}
+              | addition:op1 PLUS term:op2 {: SumIntExp expr = new SumIntExp(op1,op2); 
+                                              RESULT = expr;
+                                           :}
+              | addition:op1 MINUS term:op2 {: NegIntExp expr = new NegIntExp(op1,op2); 
+                                               RESULT = expr;
+                                            :}
+              ;
+            
+term    ::= factor:val  {:  RESULT = val; 
+                        :}
+
+          | term:op1 ASTERISK factor:op2 {: MultIntExp expr = new MultIntExp(op1,op2); 
+                                            RESULT = expr;
+                                         :}
+          | term:op1 SLASH factor:op2 {: DivIntExp expr = new DivIntExp(op1,op2); 
+                                         RESULT = expr;
+                                       :}
+          ;
+                
+factor  ::= primary:op {: RESULT = op;
+                       :}
+          | EXCLAMATION factor:value {: NegBoolExp expr = new NegBoolExp(value); 
+                                        RESULT = expr;
+                                     :}
+          
+          | MINUS factor:value  {: ConsIntExp zero = new ConsIntExp(new Integer(0));
+                                   NegIntExp expr = new NegIntExp(zero,value); 
+                                   RESULT = expr;
+                                :}
+          ;            
+                        
+primary ::= INTEGER:v  {:  ConsIntExp value = new ConsIntExp(v);
+                           RESULT = value;
+                       :}
+          | TRUE {:    ConsBoolExp value = new ConsBoolExp(true);
+                       RESULT = value;
+                   :}
+          | FALSE {:  ConsBoolExp value = new ConsBoolExp(false);
+                      RESULT = value;
+                  :}     
+          | ID:id {: 
+                    Var value = new Var(id);
+                    RESULT= value; 
+                  :}
+          | LPARENT expr:ex RPARENT {: 
+                                       RESULT = ex;
+                                    :}
+          ;
+
+program ::= MAIN LPARENT RPARENT LBRACE body:m RBRACE {: RESULT= m; :}
+        ;
+
+body ::= processDecl:declList SEMICOLON processInvk:invkList SEMICOLON {:  Main main = new Main(declList,invkList); 
+                                                                           RESULT=main; 
+                                                                        :}
+           ;
+           
+processDecl ::= proc:lp {:  LinkedList<ProcessDecl> listProcess = new LinkedList<ProcessDecl>();
+                            for (int i = 0; i < lp.size(); i++){
+                               listProcess.add(lp.get(i));
+                                                   
+                            }
+                            RESULT = listProcess;
+                        :}
+              | processDecl:listProcess SEMICOLON proc:lp {:  for (int i = 0; i < lp.size(); i++){
+                                                                  listProcess.add(lp.get(i));
+                                                              }
+                                                              RESULT = listProcess;
+                                                          :}
+              ;
+
+proc ::= varDecls:listNames COLON ID:typeProc {:  LinkedList<ProcessDecl> listProcess = new LinkedList<ProcessDecl>();
+                                              ProcessDecl p;
+                                              for (int i = 0; i < listNames.size(); i++){
+                                                    p= new ProcessDecl( listNames.get(i) , typeProc);
+                                                    listProcess.add(p);
+                                                   
+                                               }
+
+                                             RESULT = listProcess;
+                                          :}
+       ;
+      
+
+processInvk ::= invk:infoProc {:
+                                 LinkedList<InvkProcess> listInvk = new LinkedList<InvkProcess>();
+                                 listInvk.add(infoProc);
+                                 RESULT = listInvk;
+                              :}
+              |   processInvk:listInvk SEMICOLON invk:infoProc {: listInvk.add(infoProc);
+                                                                  RESULT = listInvk;
+                        
+                                                               :}
+              ;
+
+invk ::= RUN ID:id LPARENT RPARENT {:
+                                      RESULT = new InvkProcess(id);
+                                   :}
+| RUN ID:id LPARENT invkParamList:listP RPARENT {:
+                                                    RESULT = new InvkProcess(id,listP);
+                                                :} 
+;
+
+
+invkParamList ::= invkParam:par {:
+                                    LinkedList<Expression> listInvk = new LinkedList<Expression>();
+                                    listInvk.add(par);
+                                    RESULT = listInvk;
+                           :}
+|   invkParamList:listInvk COMMA	 invkParam:par {: listInvk.add(par);
+                                                 RESULT = listInvk;
+    
+                                              :}
+;
+
+
+
+invkParam::= /*INTEGER:v  {:  ConsIntExp value = new ConsIntExp(v);
+                            RESULT = value;
+                        :}
+           | TRUE {:    ConsBoolExp value = new ConsBoolExp(true);
+                        RESULT = value;
+                  :}
+           | FALSE {:  ConsBoolExp value = new ConsBoolExp(false);
+                       RESULT = value;
+                   :}*/
+           | ID:id {:  Var value = new Var(id);
+                       RESULT= value;
+                    :}
+
+
+;
