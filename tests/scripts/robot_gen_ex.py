@@ -138,7 +138,7 @@ def main(argv):
     probLight = 0.05
     seed = 0
     includeRewards = True
-    path = "synthesis/"
+    path = "tests/synthesis/"
 
 
     try:
@@ -179,19 +179,19 @@ def main(argv):
             try :
                 probRobot = float(arg)
             except ValueError :
-                print("The failure probability of the robot must be a float in (0,1)")
+                print("The failure probability of the robot must be a float in [0,1]")
                 sys.exit(2)
-            if probRobot <= 0 or probRobot >= 1 :
-                print("The failure probability of the robot must be a float in (0,1)")
+            if probRobot < 0 or probRobot > 1 :
+                print("The failure probability of the robot must be a float in [0,1]")
                 sys.exit(2)
         elif opt in ("-q","prob_fail_light=") :
             try :
                 probLight = float(arg)
             except ValueError :
-                print("The failure probability of the light must be a float in (0,1)")
+                print("The failure probability of the light must be a float in [0,1]")
                 sys.exit(2)
-            if probLight <= 0 or probLight >= 1 :
-                print("The failure probability of the light must be a float in (0,1)")
+            if probLight < 0 or probLight > 1 :
+                print("The failure probability of the light must be a float in [0,1]")
                 sys.exit(2)
         elif opt == "-r" :
             includeRewards = False

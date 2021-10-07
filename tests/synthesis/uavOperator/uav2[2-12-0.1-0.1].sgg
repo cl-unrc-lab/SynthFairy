@@ -1,0 +1,235 @@
+// Map:
+//
+// [w0-w1 danger?:False] [w0-w2 danger?:False] [w0-w3 danger?:False] [w0-w4 danger?:False] [w0-w7 danger?:False] [w0-w9 danger?:False] [w0-w10 danger?:True] [w0-w11 danger?:True] 
+// [w1-w2 danger?:False] [w1-w5 danger?:False] [w1-w8 danger?:False] [w1-w11 danger?:True] 
+// [w2-w6 danger?:False] [w2-w9 danger?:True] [w2-w11 danger?:False] 
+// [w3-w4 danger?:False] [w3-w5 danger?:False] [w3-w6 danger?:False] [w3-w9 danger?:True] [w3-w10 danger?:True] [w3-w11 danger?:False] 
+// [w4-w5 danger?:False] [w4-w8 danger?:False] [w4-w10 danger?:False] [w4-w11 danger?:False] 
+// [w5-w6 danger?:False] [w5-w10 danger?:False] [w5-w11 danger?:False] 
+// [w6-w9 danger?:True] [w6-w10 danger?:False] 
+// [w7-w8 danger?:True] [w7-w9 danger?:False] [w7-w10 danger?:True] [w7-w11 danger?:True] 
+// [w8-w10 danger?:False] [w8-w11 danger?:True] 
+// [w9-w11 danger?:True] 
+// [w10-w11 danger?:True] 
+// // Checkpoints:
+//[w3][w5][w6][w10][w11]// Rewards:
+//[w0](0)[w1](0)[w2](0)[w3](5)[w4](4)[w5](2)[w6](2)[w7](2)[w8](8)[w9](0)[w10](6)[w11](9)
+
+Process UAVOperator {
+    wc : INT ;    // waypoint current, -1 : null
+
+    w0 : BOOL ;  // visited w0?
+    w1 : BOOL ;  // visited w1?
+    w2 : BOOL ;  // visited w2?
+    w3 : BOOL ;  // visited w3?
+    w4 : BOOL ;  // visited w4?
+    w5 : BOOL ;  // visited w5?
+    w6 : BOOL ;  // visited w6?
+    w7 : BOOL ;  // visited w7?
+    w8 : BOOL ;  // visited w8?
+    w9 : BOOL ;  // visited w9?
+    w10 : BOOL ;  // visited w10?
+    w11 : BOOL ;  // visited w11?
+    state: INT ; // 0:init,1:okPic,2:del,3:ndel,4:finish
+    fuel : INT ;  // UAV fuel
+    ctrl : BOOL ;  // player turn
+
+   Rewards :
+       state==1 && !w0 && wc==0 : 1,
+       state==1 && !w1 && wc==1 : 1,
+       state==1 && !w2 && wc==2 : 1,
+       state==1 && !w3 && wc==3 : 1,
+       state==1 && !w4 && wc==4 : 1,
+       state==1 && !w5 && wc==5 : 1,
+       state==1 && !w6 && wc==6 : 1,
+       state==1 && !w7 && wc==7 : 1,
+       state==1 && !w8 && wc==8 : 1,
+       state==1 && !w9 && wc==9 : 1,
+       state==1 && !w10 && wc==10 : 1,
+       state==1 && !w11 && wc==11 : 1;
+
+   Controller : ctrl;
+   Goal : state==4;
+    // Initial State
+   Initial : fuel==30 && wc==0 && !ctrl && state==0 && !w0 && !w1 && !w2 && !w3 && !w4 && !w5 && !w6 && !w7 && !w8 && !w9 && !w10 && !w11;
+
+    // environment moves
+
+    [loiter] !ctrl && !(wc==-1) && state == 0 && fuel > 0 -> state = 0;
+    [okPic] !ctrl && !(wc==-1) && state == 0 && fuel > 0 -> state = 1;
+    [delegate] !ctrl && state == 1 && wc == 0 && fuel > 0 -> state = 3, ctrl = true, w0 = true;
+    [delegate] !ctrl && state == 1 && wc == 1 && fuel > 0 -> state = 3, ctrl = true, w1 = true;
+    [delegate] !ctrl && state == 1 && wc == 2 && fuel > 0 -> state = 3, ctrl = true, w2 = true;
+    [delegate] !ctrl && state == 1 && wc == 3 && fuel > 0 -> 0.1: state = 3,ctrl = true, w3 = true ++ 0.9: state = 2, w3 = true;
+    [delegate] !ctrl && state == 1 && wc == 4 && fuel > 0 -> state = 3, ctrl = true, w4 = true;
+    [delegate] !ctrl && state == 1 && wc == 5 && fuel > 0 -> 0.1: state = 3,ctrl = true, w5 = true ++ 0.9: state = 2, w5 = true;
+    [delegate] !ctrl && state == 1 && wc == 6 && fuel > 0 -> 0.1: state = 3,ctrl = true, w6 = true ++ 0.9: state = 2, w6 = true;
+    [delegate] !ctrl && state == 1 && wc == 7 && fuel > 0 -> state = 3, ctrl = true, w7 = true;
+    [delegate] !ctrl && state == 1 && wc == 8 && fuel > 0 -> state = 3, ctrl = true, w8 = true;
+    [delegate] !ctrl && state == 1 && wc == 9 && fuel > 0 -> state = 3, ctrl = true, w9 = true;
+    [delegate] !ctrl && state == 1 && wc == 10 && fuel > 0 -> 0.1: state = 3,ctrl = true, w10 = true ++ 0.9: state = 2, w10 = true;
+    [delegate] !ctrl && state == 1 && wc == 11 && fuel > 0 -> 0.1: state = 3,ctrl = true, w11 = true ++ 0.9: state = 2, w11 = true;
+    [fly_0_1] !ctrl && state == 2 && wc == 0 && fuel > 0 -> state = 0, wc = 1, fuel = fuel - 1;
+    [fly_0_2] !ctrl && state == 2 && wc == 0 && fuel > 0 -> state = 0, wc = 2, fuel = fuel - 1;
+    [fly_0_3] !ctrl && state == 2 && wc == 0 && fuel > 0 -> state = 0, wc = 3, fuel = fuel - 1;
+    [fly_0_4] !ctrl && state == 2 && wc == 0 && fuel > 0 -> state = 0, wc = 4, fuel = fuel - 1;
+    [fly_0_7] !ctrl && state == 2 && wc == 0 && fuel > 0 -> state = 0, wc = 7, fuel = fuel - 1;
+    [fly_0_9] !ctrl && state == 2 && wc == 0 && fuel > 0 -> state = 0, wc = 9, fuel = fuel - 1;
+    [fly_0_10] !ctrl && state == 2 && wc == 0 && fuel > 0 -> state = 4;
+    [fly_0_11] !ctrl && state == 2 && wc == 0 && fuel > 0 -> state = 4;
+    [fly_1_0] !ctrl && state == 2 && wc == 1 && fuel > 0 -> state = 0, wc = 0, fuel = fuel - 1;
+    [fly_1_2] !ctrl && state == 2 && wc == 1 && fuel > 0 -> state = 0, wc = 2, fuel = fuel - 1;
+    [fly_1_5] !ctrl && state == 2 && wc == 1 && fuel > 0 -> state = 0, wc = 5, fuel = fuel - 1;
+    [fly_1_8] !ctrl && state == 2 && wc == 1 && fuel > 0 -> state = 0, wc = 8, fuel = fuel - 1;
+    [fly_1_11] !ctrl && state == 2 && wc == 1 && fuel > 0 -> state = 4;
+    [fly_2_0] !ctrl && state == 2 && wc == 2 && fuel > 0 -> state = 0, wc = 0, fuel = fuel - 1;
+    [fly_2_1] !ctrl && state == 2 && wc == 2 && fuel > 0 -> state = 0, wc = 1, fuel = fuel - 1;
+    [fly_2_6] !ctrl && state == 2 && wc == 2 && fuel > 0 -> state = 0, wc = 6, fuel = fuel - 1;
+    [fly_2_9] !ctrl && state == 2 && wc == 2 && fuel > 0 -> state = 4;
+    [fly_2_11] !ctrl && state == 2 && wc == 2 && fuel > 0 -> state = 0, wc = 11, fuel = fuel - 1;
+    [fly_3_0] !ctrl && state == 2 && wc == 3 && fuel > 0 -> state = 0, wc = 0, fuel = fuel - 1;
+    [fly_3_4] !ctrl && state == 2 && wc == 3 && fuel > 0 -> state = 0, wc = 4, fuel = fuel - 1;
+    [fly_3_5] !ctrl && state == 2 && wc == 3 && fuel > 0 -> state = 0, wc = 5, fuel = fuel - 1;
+    [fly_3_6] !ctrl && state == 2 && wc == 3 && fuel > 0 -> state = 0, wc = 6, fuel = fuel - 1;
+    [fly_3_9] !ctrl && state == 2 && wc == 3 && fuel > 0 -> state = 4;
+    [fly_3_10] !ctrl && state == 2 && wc == 3 && fuel > 0 -> state = 4;
+    [fly_3_11] !ctrl && state == 2 && wc == 3 && fuel > 0 -> state = 0, wc = 11, fuel = fuel - 1;
+    [fly_4_0] !ctrl && state == 2 && wc == 4 && fuel > 0 -> state = 0, wc = 0, fuel = fuel - 1;
+    [fly_4_3] !ctrl && state == 2 && wc == 4 && fuel > 0 -> state = 0, wc = 3, fuel = fuel - 1;
+    [fly_4_5] !ctrl && state == 2 && wc == 4 && fuel > 0 -> state = 0, wc = 5, fuel = fuel - 1;
+    [fly_4_8] !ctrl && state == 2 && wc == 4 && fuel > 0 -> state = 0, wc = 8, fuel = fuel - 1;
+    [fly_4_10] !ctrl && state == 2 && wc == 4 && fuel > 0 -> state = 0, wc = 10, fuel = fuel - 1;
+    [fly_4_11] !ctrl && state == 2 && wc == 4 && fuel > 0 -> state = 0, wc = 11, fuel = fuel - 1;
+    [fly_5_1] !ctrl && state == 2 && wc == 5 && fuel > 0 -> state = 0, wc = 1, fuel = fuel - 1;
+    [fly_5_3] !ctrl && state == 2 && wc == 5 && fuel > 0 -> state = 0, wc = 3, fuel = fuel - 1;
+    [fly_5_4] !ctrl && state == 2 && wc == 5 && fuel > 0 -> state = 0, wc = 4, fuel = fuel - 1;
+    [fly_5_6] !ctrl && state == 2 && wc == 5 && fuel > 0 -> state = 0, wc = 6, fuel = fuel - 1;
+    [fly_5_10] !ctrl && state == 2 && wc == 5 && fuel > 0 -> state = 0, wc = 10, fuel = fuel - 1;
+    [fly_5_11] !ctrl && state == 2 && wc == 5 && fuel > 0 -> state = 0, wc = 11, fuel = fuel - 1;
+    [fly_6_2] !ctrl && state == 2 && wc == 6 && fuel > 0 -> state = 0, wc = 2, fuel = fuel - 1;
+    [fly_6_3] !ctrl && state == 2 && wc == 6 && fuel > 0 -> state = 0, wc = 3, fuel = fuel - 1;
+    [fly_6_5] !ctrl && state == 2 && wc == 6 && fuel > 0 -> state = 0, wc = 5, fuel = fuel - 1;
+    [fly_6_9] !ctrl && state == 2 && wc == 6 && fuel > 0 -> state = 4;
+    [fly_6_10] !ctrl && state == 2 && wc == 6 && fuel > 0 -> state = 0, wc = 10, fuel = fuel - 1;
+    [fly_7_0] !ctrl && state == 2 && wc == 7 && fuel > 0 -> state = 0, wc = 0, fuel = fuel - 1;
+    [fly_7_8] !ctrl && state == 2 && wc == 7 && fuel > 0 -> state = 4;
+    [fly_7_9] !ctrl && state == 2 && wc == 7 && fuel > 0 -> state = 0, wc = 9, fuel = fuel - 1;
+    [fly_7_10] !ctrl && state == 2 && wc == 7 && fuel > 0 -> state = 4;
+    [fly_7_11] !ctrl && state == 2 && wc == 7 && fuel > 0 -> state = 4;
+    [fly_8_1] !ctrl && state == 2 && wc == 8 && fuel > 0 -> state = 0, wc = 1, fuel = fuel - 1;
+    [fly_8_4] !ctrl && state == 2 && wc == 8 && fuel > 0 -> state = 0, wc = 4, fuel = fuel - 1;
+    [fly_8_7] !ctrl && state == 2 && wc == 8 && fuel > 0 -> state = 4;
+    [fly_8_10] !ctrl && state == 2 && wc == 8 && fuel > 0 -> state = 0, wc = 10, fuel = fuel - 1;
+    [fly_8_11] !ctrl && state == 2 && wc == 8 && fuel > 0 -> state = 4;
+    [fly_9_0] !ctrl && state == 2 && wc == 9 && fuel > 0 -> state = 0, wc = 0, fuel = fuel - 1;
+    [fly_9_2] !ctrl && state == 2 && wc == 9 && fuel > 0 -> state = 4;
+    [fly_9_3] !ctrl && state == 2 && wc == 9 && fuel > 0 -> state = 4;
+    [fly_9_6] !ctrl && state == 2 && wc == 9 && fuel > 0 -> state = 4;
+    [fly_9_7] !ctrl && state == 2 && wc == 9 && fuel > 0 -> state = 0, wc = 7, fuel = fuel - 1;
+    [fly_9_11] !ctrl && state == 2 && wc == 9 && fuel > 0 -> state = 4;
+    [fly_10_0] !ctrl && state == 2 && wc == 10 && fuel > 0 -> state = 4;
+    [fly_10_3] !ctrl && state == 2 && wc == 10 && fuel > 0 -> state = 4;
+    [fly_10_4] !ctrl && state == 2 && wc == 10 && fuel > 0 -> state = 0, wc = 4, fuel = fuel - 1;
+    [fly_10_5] !ctrl && state == 2 && wc == 10 && fuel > 0 -> state = 0, wc = 5, fuel = fuel - 1;
+    [fly_10_6] !ctrl && state == 2 && wc == 10 && fuel > 0 -> state = 0, wc = 6, fuel = fuel - 1;
+    [fly_10_7] !ctrl && state == 2 && wc == 10 && fuel > 0 -> state = 4;
+    [fly_10_8] !ctrl && state == 2 && wc == 10 && fuel > 0 -> state = 0, wc = 8, fuel = fuel - 1;
+    [fly_10_11] !ctrl && state == 2 && wc == 10 && fuel > 0 -> state = 4;
+    [fly_11_0] !ctrl && state == 2 && wc == 11 && fuel > 0 -> state = 4;
+    [fly_11_1] !ctrl && state == 2 && wc == 11 && fuel > 0 -> state = 4;
+    [fly_11_2] !ctrl && state == 2 && wc == 11 && fuel > 0 -> state = 0, wc = 2, fuel = fuel - 1;
+    [fly_11_3] !ctrl && state == 2 && wc == 11 && fuel > 0 -> state = 0, wc = 3, fuel = fuel - 1;
+    [fly_11_4] !ctrl && state == 2 && wc == 11 && fuel > 0 -> state = 0, wc = 4, fuel = fuel - 1;
+    [fly_11_5] !ctrl && state == 2 && wc == 11 && fuel > 0 -> state = 0, wc = 5, fuel = fuel - 1;
+    [fly_11_7] !ctrl && state == 2 && wc == 11 && fuel > 0 -> state = 4;
+    [fly_11_8] !ctrl && state == 2 && wc == 11 && fuel > 0 -> state = 4;
+    [fly_11_9] !ctrl && state == 2 && wc == 11 && fuel > 0 -> state = 4;
+    [fly_11_10] !ctrl && state == 2 && wc == 11 && fuel > 0 -> state = 4;
+
+    // controller moves
+
+    [fly_0_1] ctrl && state == 3 && wc == 0 && fuel > 0 -> ctrl = false, state = 0, wc = 1, fuel = fuel - 1;
+    [fly_0_2] ctrl && state == 3 && wc == 0 && fuel > 0 -> ctrl = false, state = 0, wc = 2, fuel = fuel - 1;
+    [fly_0_3] ctrl && state == 3 && wc == 0 && fuel > 0 -> ctrl = false, state = 0, wc = 3, fuel = fuel - 1;
+    [fly_0_4] ctrl && state == 3 && wc == 0 && fuel > 0 -> ctrl = false, state = 0, wc = 4, fuel = fuel - 1;
+    [fly_0_7] ctrl && state == 3 && wc == 0 && fuel > 0 -> ctrl = false, state = 0, wc = 7, fuel = fuel - 1;
+    [fly_0_9] ctrl && state == 3 && wc == 0 && fuel > 0 -> ctrl = false, state = 0, wc = 9, fuel = fuel - 1;
+    [fly_0_10] ctrl && state == 3 && wc == 0 && fuel > 0 -> state = 4;
+    [fly_0_11] ctrl && state == 3 && wc == 0 && fuel > 0 -> state = 4;
+    [fly_1_0] ctrl && state == 3 && wc == 1 && fuel > 0 -> ctrl = false, state = 0, wc = 0, fuel = fuel - 1;
+    [fly_1_2] ctrl && state == 3 && wc == 1 && fuel > 0 -> ctrl = false, state = 0, wc = 2, fuel = fuel - 1;
+    [fly_1_5] ctrl && state == 3 && wc == 1 && fuel > 0 -> ctrl = false, state = 0, wc = 5, fuel = fuel - 1;
+    [fly_1_8] ctrl && state == 3 && wc == 1 && fuel > 0 -> ctrl = false, state = 0, wc = 8, fuel = fuel - 1;
+    [fly_1_11] ctrl && state == 3 && wc == 1 && fuel > 0 -> state = 4;
+    [fly_2_0] ctrl && state == 3 && wc == 2 && fuel > 0 -> ctrl = false, state = 0, wc = 0, fuel = fuel - 1;
+    [fly_2_1] ctrl && state == 3 && wc == 2 && fuel > 0 -> ctrl = false, state = 0, wc = 1, fuel = fuel - 1;
+    [fly_2_6] ctrl && state == 3 && wc == 2 && fuel > 0 -> ctrl = false, state = 0, wc = 6, fuel = fuel - 1;
+    [fly_2_9] ctrl && state == 3 && wc == 2 && fuel > 0 -> state = 4;
+    [fly_2_11] ctrl && state == 3 && wc == 2 && fuel > 0 -> ctrl = false, state = 0, wc = 11, fuel = fuel - 1;
+    [fly_3_0] ctrl && state == 3 && wc == 3 && fuel > 0 -> ctrl = false, state = 0, wc = 0, fuel = fuel - 1;
+    [fly_3_4] ctrl && state == 3 && wc == 3 && fuel > 0 -> ctrl = false, state = 0, wc = 4, fuel = fuel - 1;
+    [fly_3_5] ctrl && state == 3 && wc == 3 && fuel > 0 -> ctrl = false, state = 0, wc = 5, fuel = fuel - 1;
+    [fly_3_6] ctrl && state == 3 && wc == 3 && fuel > 0 -> ctrl = false, state = 0, wc = 6, fuel = fuel - 1;
+    [fly_3_9] ctrl && state == 3 && wc == 3 && fuel > 0 -> state = 4;
+    [fly_3_10] ctrl && state == 3 && wc == 3 && fuel > 0 -> state = 4;
+    [fly_3_11] ctrl && state == 3 && wc == 3 && fuel > 0 -> ctrl = false, state = 0, wc = 11, fuel = fuel - 1;
+    [fly_4_0] ctrl && state == 3 && wc == 4 && fuel > 0 -> ctrl = false, state = 0, wc = 0, fuel = fuel - 1;
+    [fly_4_3] ctrl && state == 3 && wc == 4 && fuel > 0 -> ctrl = false, state = 0, wc = 3, fuel = fuel - 1;
+    [fly_4_5] ctrl && state == 3 && wc == 4 && fuel > 0 -> ctrl = false, state = 0, wc = 5, fuel = fuel - 1;
+    [fly_4_8] ctrl && state == 3 && wc == 4 && fuel > 0 -> ctrl = false, state = 0, wc = 8, fuel = fuel - 1;
+    [fly_4_10] ctrl && state == 3 && wc == 4 && fuel > 0 -> ctrl = false, state = 0, wc = 10, fuel = fuel - 1;
+    [fly_4_11] ctrl && state == 3 && wc == 4 && fuel > 0 -> ctrl = false, state = 0, wc = 11, fuel = fuel - 1;
+    [fly_5_1] ctrl && state == 3 && wc == 5 && fuel > 0 -> ctrl = false, state = 0, wc = 1, fuel = fuel - 1;
+    [fly_5_3] ctrl && state == 3 && wc == 5 && fuel > 0 -> ctrl = false, state = 0, wc = 3, fuel = fuel - 1;
+    [fly_5_4] ctrl && state == 3 && wc == 5 && fuel > 0 -> ctrl = false, state = 0, wc = 4, fuel = fuel - 1;
+    [fly_5_6] ctrl && state == 3 && wc == 5 && fuel > 0 -> ctrl = false, state = 0, wc = 6, fuel = fuel - 1;
+    [fly_5_10] ctrl && state == 3 && wc == 5 && fuel > 0 -> ctrl = false, state = 0, wc = 10, fuel = fuel - 1;
+    [fly_5_11] ctrl && state == 3 && wc == 5 && fuel > 0 -> ctrl = false, state = 0, wc = 11, fuel = fuel - 1;
+    [fly_6_2] ctrl && state == 3 && wc == 6 && fuel > 0 -> ctrl = false, state = 0, wc = 2, fuel = fuel - 1;
+    [fly_6_3] ctrl && state == 3 && wc == 6 && fuel > 0 -> ctrl = false, state = 0, wc = 3, fuel = fuel - 1;
+    [fly_6_5] ctrl && state == 3 && wc == 6 && fuel > 0 -> ctrl = false, state = 0, wc = 5, fuel = fuel - 1;
+    [fly_6_9] ctrl && state == 3 && wc == 6 && fuel > 0 -> state = 4;
+    [fly_6_10] ctrl && state == 3 && wc == 6 && fuel > 0 -> ctrl = false, state = 0, wc = 10, fuel = fuel - 1;
+    [fly_7_0] ctrl && state == 3 && wc == 7 && fuel > 0 -> ctrl = false, state = 0, wc = 0, fuel = fuel - 1;
+    [fly_7_8] ctrl && state == 3 && wc == 7 && fuel > 0 -> state = 4;
+    [fly_7_9] ctrl && state == 3 && wc == 7 && fuel > 0 -> ctrl = false, state = 0, wc = 9, fuel = fuel - 1;
+    [fly_7_10] ctrl && state == 3 && wc == 7 && fuel > 0 -> state = 4;
+    [fly_7_11] ctrl && state == 3 && wc == 7 && fuel > 0 -> state = 4;
+    [fly_8_1] ctrl && state == 3 && wc == 8 && fuel > 0 -> ctrl = false, state = 0, wc = 1, fuel = fuel - 1;
+    [fly_8_4] ctrl && state == 3 && wc == 8 && fuel > 0 -> ctrl = false, state = 0, wc = 4, fuel = fuel - 1;
+    [fly_8_7] ctrl && state == 3 && wc == 8 && fuel > 0 -> state = 4;
+    [fly_8_10] ctrl && state == 3 && wc == 8 && fuel > 0 -> ctrl = false, state = 0, wc = 10, fuel = fuel - 1;
+    [fly_8_11] ctrl && state == 3 && wc == 8 && fuel > 0 -> state = 4;
+    [fly_9_0] ctrl && state == 3 && wc == 9 && fuel > 0 -> ctrl = false, state = 0, wc = 0, fuel = fuel - 1;
+    [fly_9_2] ctrl && state == 3 && wc == 9 && fuel > 0 -> state = 4;
+    [fly_9_3] ctrl && state == 3 && wc == 9 && fuel > 0 -> state = 4;
+    [fly_9_6] ctrl && state == 3 && wc == 9 && fuel > 0 -> state = 4;
+    [fly_9_7] ctrl && state == 3 && wc == 9 && fuel > 0 -> ctrl = false, state = 0, wc = 7, fuel = fuel - 1;
+    [fly_9_11] ctrl && state == 3 && wc == 9 && fuel > 0 -> state = 4;
+    [fly_10_0] ctrl && state == 3 && wc == 10 && fuel > 0 -> state = 4;
+    [fly_10_3] ctrl && state == 3 && wc == 10 && fuel > 0 -> state = 4;
+    [fly_10_4] ctrl && state == 3 && wc == 10 && fuel > 0 -> ctrl = false, state = 0, wc = 4, fuel = fuel - 1;
+    [fly_10_5] ctrl && state == 3 && wc == 10 && fuel > 0 -> ctrl = false, state = 0, wc = 5, fuel = fuel - 1;
+    [fly_10_6] ctrl && state == 3 && wc == 10 && fuel > 0 -> ctrl = false, state = 0, wc = 6, fuel = fuel - 1;
+    [fly_10_7] ctrl && state == 3 && wc == 10 && fuel > 0 -> state = 4;
+    [fly_10_8] ctrl && state == 3 && wc == 10 && fuel > 0 -> ctrl = false, state = 0, wc = 8, fuel = fuel - 1;
+    [fly_10_11] ctrl && state == 3 && wc == 10 && fuel > 0 -> state = 4;
+    [fly_11_0] ctrl && state == 3 && wc == 11 && fuel > 0 -> state = 4;
+    [fly_11_1] ctrl && state == 3 && wc == 11 && fuel > 0 -> state = 4;
+    [fly_11_2] ctrl && state == 3 && wc == 11 && fuel > 0 -> ctrl = false, state = 0, wc = 2, fuel = fuel - 1;
+    [fly_11_3] ctrl && state == 3 && wc == 11 && fuel > 0 -> ctrl = false, state = 0, wc = 3, fuel = fuel - 1;
+    [fly_11_4] ctrl && state == 3 && wc == 11 && fuel > 0 -> ctrl = false, state = 0, wc = 4, fuel = fuel - 1;
+    [fly_11_5] ctrl && state == 3 && wc == 11 && fuel > 0 -> ctrl = false, state = 0, wc = 5, fuel = fuel - 1;
+    [fly_11_7] ctrl && state == 3 && wc == 11 && fuel > 0 -> state = 4;
+    [fly_11_8] ctrl && state == 3 && wc == 11 && fuel > 0 -> state = 4;
+    [fly_11_9] ctrl && state == 3 && wc == 11 && fuel > 0 -> state = 4;
+    [fly_11_10] ctrl && state == 3 && wc == 11 && fuel > 0 -> state = 4;
+    [finish] w0 && w1 && w2 && w3 && w4 && w5 && w6 && w7 && w8 && w9 && w10 && w11 -> state = 4;
+    [finish] state == 4 -> state = 4;
+    [outOfFuel] fuel <= 0 -> state = 4;
+}
+
+Main() {
+    uav : UAVOperator ;
+    run uav() ;
+}

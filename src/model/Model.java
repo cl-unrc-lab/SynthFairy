@@ -194,9 +194,9 @@ public class Model {
 		try{
 			String path = "";
 			if (isImp)
-            	path ="out/" + "ImpModel" +".dot";
+            	path ="../out/" + "ImpModel" +".dot";
             else
-            	path ="out/" + "SpecModel" +".dot";
+            	path ="../out/" + "SpecModel" +".dot";
             File file = new File(path);
             file.createNewFile();
             FileWriter fw = new FileWriter(file);
@@ -225,7 +225,7 @@ public class Model {
 		LinkedList<ModelState> fsts;
 		LinkedList<ModelState> snds;
 		LinkedList<String> lbls;
-		LinkedList<Boolean> isFs;
+		//LinkedList<Boolean> isFs;
 		LinkedList<Boolean> isTaus;
 
 

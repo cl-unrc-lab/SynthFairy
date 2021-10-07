@@ -1,0 +1,458 @@
+MacBook-Air-2:bin luciano$ ./test
+Robot A 1-8-60-0.1
+Building Model...
+Building Game Graph...
+Game graph states: 2614
+Game graph transitions: 4418
+Expected Total Reward: 26.66666666666667
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	0m13.298s
+user	0m17.678s
+sys	0m0.488s
+Robot A 1-8-60-0.5
+Building Model...
+Building Game Graph...
+Game graph states: 2614
+Game graph transitions: 4418
+Expected Total Reward: 48.0
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	0m34.720s
+user	0m38.487s
+sys	0m0.706s
+Robot A 1-8-60-0.9
+Building Model...
+Building Game Graph...
+Game graph states: 2614
+Game graph transitions: 4418
+Expected Total Reward: 240.0000000000087
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	3m2.788s
+user	2m59.062s
+sys	0m2.627s
+Robot A 2-8-60-0.1
+Building Model...
+Building Game Graph...
+Game graph states: 2540
+Game graph transitions: 4266
+Expected Total Reward: 31.111111111111114
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	0m14.486s
+user	0m17.734s
+sys	0m0.584s
+Robot A 2-8-60-0.5
+Building Model...
+Building Game Graph...
+Game graph states: 2540
+Game graph transitions: 4266
+Expected Total Reward: 56.0
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	0m31.100s
+user	0m33.945s
+sys	0m0.704s
+Robot A 2-8-60-0.9
+Building Model...
+Building Game Graph...
+Game graph states: 2540
+Game graph transitions: 4266
+Expected Total Reward: 280.0000000000064
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	2m45.421s
+user	2m47.569s
+sys	0m1.915s
+Robot A 3-8-60-0.1
+Building Model...
+Building Game Graph...
+Game graph states: 2552
+Game graph transitions: 4295
+Expected Total Reward: 27.77777900900346
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	0m7.663s
+user	0m11.888s
+sys	0m0.414s
+Robot A 3-8-60-0.5
+Building Model...
+Building Game Graph...
+Game graph states: 2552
+Game graph transitions: 4295
+Expected Total Reward: 50.00006340668216
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	0m10.989s
+user	0m15.071s
+sys	0m0.451s
+Robot A 3-8-60-0.9
+Building Model...
+Building Game Graph...
+Game graph states: 2552
+Game graph transitions: 4295
+Expected Total Reward: 250.00301356346012
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	0m34.223s
+user	0m38.783s
+sys	0m0.642s
+Robot A 1-16-120-0.1
+Building Model...
+Building Game Graph...
+Game graph states: 10161
+Game graph transitions: 17125
+Expected Total Reward: 62.22222222222227
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	2m3.842s
+user	2m6.370s
+sys	0m2.277s
+Robot A 1-16-120-0.5
+Building Model...
+Building Game Graph...
+Game graph states: 10161
+Game graph transitions: 17125
+Expected Total Reward: 112.0
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	3m50.297s
+user	3m55.335s
+sys	0m2.761s
+Robot A 1-16-120-0.9
+Building Model...
+Building Game Graph...
+Game graph states: 10161
+Game graph transitions: 17125
+Expected Total Reward: 560.0000000000424
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	19m13.801s
+user	19m5.227s
+sys	0m9.856s
+Robot A 2-16-120-0.1
+Building Model...
+Building Game Graph...
+Game graph states: 10217
+Game graph transitions: 17223
+Expected Total Reward: 55.5555555555556
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	2m20.509s
+user	2m16.384s
+sys	0m2.696s
+Robot A 2-16-120-0.5
+Building Model...
+Building Game Graph...
+Game graph states: 10217
+Game graph transitions: 17223
+Expected Total Reward: 100.0
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	4m1.580s
+user	4m5.929s
+sys	0m2.497s
+Robot A 2-16-120-0.9
+Building Model...
+Building Game Graph...
+Game graph states: 10217
+Game graph transitions: 17223
+Expected Total Reward: 500.0000000000367
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	21m0.219s
+user	19m59.068s
+sys	0m13.191s
+Robot A 3-16-120-0.1
+Building Model...
+Building Game Graph...
+Game graph states: 10249
+Game graph transitions: 17319
+Expected Total Reward: 48.88888888888892
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	2m33.172s
+user	2m19.696s
+sys	0m2.908s
+Robot A 3-16-120-0.5
+Building Model...
+Building Game Graph...
+Game graph states: 10249
+Game graph transitions: 17319
+Expected Total Reward: 88.0
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	4m20.534s
+user	4m10.567s
+sys	0m3.278s
+Robot A 3-16-120-0.9
+Building Model...
+Building Game Graph...
+Game graph states: 10249
+Game graph transitions: 17319
+Expected Total Reward: 440.000000000035
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	23m57.606s
+user	22m22.451s
+sys	0m17.693s
+Robot B 1-8-60-0.1-0.1
+Building Model...
+Building Game Graph...
+Game graph states: 4724
+Game graph transitions: 8788
+Expected Total Reward: 42.600758740497156
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	0m20.803s
+user	0m25.626s
+sys	0m0.568s
+Robot B 1-8-60-0.1-0.5
+Building Model...
+Building Game Graph...
+Game graph states: 4724
+Game graph transitions: 8788
+Expected Total Reward: 130.15068126573445
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	0m31.163s
+user	0m36.172s
+sys	0m0.549s
+Robot B 1-8-60-0.5-0.1
+Building Model...
+Building Game Graph...
+Game graph states: 4724
+Game graph transitions: 8788
+Expected Total Reward: 76.68181333496845
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	0m31.575s
+user	0m36.611s
+sys	0m0.622s
+Robot B 1-8-60-0.5-0.5
+Building Model...
+Building Game Graph...
+Game graph states: 4724
+Game graph transitions: 8788
+Expected Total Reward: 234.2757813593101
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	0m53.493s
+user	0m58.276s
+sys	0m0.862s
+Robot B 2-8-60-0.1-0.1
+Building Model...
+Building Game Graph...
+Game graph states: 4586
+Game graph transitions: 8484
+Expected Total Reward: 44.5912047018429
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	0m47.285s
+user	0m52.567s
+sys	0m0.761s
+Robot B 2-8-60-0.1-0.5
+Building Model...
+Building Game Graph...
+Game graph states: 4586
+Game graph transitions: 8484
+Expected Total Reward: 127.70689610346443
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	1m50.250s
+user	1m55.438s
+sys	0m1.380s
+Robot B 2-8-60-0.5-0.1
+Building Model...
+Building Game Graph...
+Game graph states: 4586
+Game graph transitions: 8484
+Expected Total Reward: 80.26416846331747
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	1m46.693s
+user	1m52.407s
+sys	0m1.173s
+Robot B 2-8-60-0.5-0.5
+Building Model...
+Building Game Graph...
+Game graph states: 4586
+Game graph transitions: 8484
+Expected Total Reward: 229.87241298623735
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	3m26.320s
+user	3m31.786s
+sys	0m1.862s
+Robot B 3-8-60-0.1-0.1
+Building Model...
+Building Game Graph...
+Game graph states: 4609
+Game graph transitions: 8542
+Expected Total Reward: 42.23499109610614
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	0m19.636s
+user	0m24.819s
+sys	0m0.493s
+Robot B 3-8-60-0.1-0.5
+Building Model...
+Building Game Graph...
+Game graph states: 4609
+Game graph transitions: 8542
+Expected Total Reward: 136.23088992157307
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	0m31.059s
+user	0m36.066s
+sys	0m0.525s
+Robot B 3-8-60-0.5-0.1
+Building Model...
+Building Game Graph...
+Game graph states: 4609
+Game graph transitions: 8542
+Expected Total Reward: 76.02359112318993
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	0m30.670s
+user	0m35.437s
+sys	0m0.528s
+Robot B 3-8-60-0.5-0.5
+Building Model...
+Building Game Graph...
+Game graph states: 4609
+Game graph transitions: 8542
+Expected Total Reward: 245.2200259328446
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	0m51.371s
+user	0m56.535s
+sys	0m0.691s
+Robot B 1-16-120-0.1-0.1
+Building Model...
+Building Game Graph...
+Game graph states: 18384
+Game graph transitions: 34154
+Expected Total Reward: 91.19640330742426
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	6m10.956s
+user	6m22.421s
+sys	0m2.476s
+Robot B 1-16-120-0.1-0.5
+Building Model...
+Building Game Graph...
+Game graph states: 18384
+Game graph transitions: 34154
+Expected Total Reward: 281.8366009681481
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	13m31.366s
+user	13m45.583s
+sys	0m4.913s
+Robot B 1-16-120-0.5-0.1
+Building Model...
+Building Game Graph...
+Game graph states: 18384
+Game graph transitions: 34154
+Expected Total Reward: 164.1535259533647
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	12m33.700s
+user	12m54.301s
+sys	0m3.643s
+Robot B 1-16-120-0.5-0.5
+Building Model...
+Building Game Graph...
+Game graph states: 18384
+Game graph transitions: 34154
+Expected Total Reward: 507.30588174267314
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	26m2.666s
+user	26m3.906s
+sys	0m12.592s
+Robot B 2-16-120-0.1-0.1
+Building Model...
+Building Game Graph...
+Game graph states: 18486
+Game graph transitions: 34350
+Expected Total Reward: 87.27796474610278
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	6m17.295s
+user	6m28.831s
+sys	0m2.557s
+Robot B 2-16-120-0.1-0.5
+Building Model...
+Building Game Graph...
+Game graph states: 18486
+Game graph transitions: 34350
+Expected Total Reward: 281.4878817776668
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	13m11.619s
+user	13m26.979s
+sys	0m4.707s
+Robot B 2-16-120-0.5-0.1
+Building Model...
+Building Game Graph...
+Game graph states: 18486
+Game graph transitions: 34350
+Expected Total Reward: 157.10033654298593
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	13m38.989s
+user	13m53.616s
+sys	0m4.866s
+Robot B 2-16-120-0.5-0.5
+Building Model...
+Building Game Graph...
+Game graph states: 18486
+Game graph transitions: 34350
+Expected Total Reward: 506.67818719980585
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	26m9.920s
+user	25m55.411s
+sys	0m16.491s
+Robot B 3-16-120-0.1-0.1
+Building Model...
+Building Game Graph...
+Game graph states: 18550
+Game graph transitions: 34542
+Expected Total Reward: 80.07315436219956
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	4m42.406s
+user	4m48.824s
+sys	0m3.141s
+Robot B 3-16-120-0.1-0.5
+Building Model...
+Building Game Graph...
+Game graph states: 18550
+Game graph transitions: 34542
+Expected Total Reward: 265.3417610634346
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	7m54.181s
+user	7m20.913s
+sys	0m7.273s
+Robot B 3-16-120-0.5-0.1
+Building Model...
+Building Game Graph...
+Game graph states: 18550
+Game graph transitions: 34542
+Expected Total Reward: 144.13370358441085
+A strategy for the Controller has been synthesized! --> out/<filename>.strat
+
+real	7m51.368s
+user	7m23.206s
+sys	0m5.240s
+Robot B 3-16-120-0.5-0.5
+Building Model...
+Building Game Graph...
+Game graph states: 18550
+Game graph transitions: 34542
+Expected Total Reward: 477.6283725011283

@@ -4,7 +4,6 @@ import java.util.*;
 
 import model.*;
 
-import java.io.*;
 
 
 /**
@@ -109,7 +108,7 @@ public class Program extends ProgramNode{
     }
 
     
-    public Model toGraph(boolean isSpec){
+    public Model toLTS(boolean isSpec){
         Model m = new Model(globalVars, isSpec);
 
         //states in m are lists of states (from processes)
@@ -132,7 +131,56 @@ public class Program extends ProgramNode{
 
         TreeSet<ModelState> iterSet = new TreeSet<ModelState>();
         iterSet.add(m.getInitial());
+        //build the whole model
+        while(!iterSet.isEmpty()){
+            ModelState curr = iterSet.pollFirst();
+            for (int i = 0; i < m.getProcDecls().size(); i++){ // for each process in current global state
+                for (Branch b : m.getProcs().get(i).getBranches()){
+                    if (b.getIsTau())
+                        m.setIsWeak(true);
+                    if (curr.satisfies(b.getGuard(),i)){
+                        //create global successor curr_
+                        ModelState curr_ = curr.createSuccessor(b.getAssignList(),i);
+                        ModelState toOld = m.search(curr_);
+                        Action act = new Action(m.getProcDecls().get(i)+b.getLabel(),b.getIsFaulty(),b.getIsTau(),b.getReward(),isSpec);
+                        if (toOld == null){
+                            m.addNode(curr_);
+                            iterSet.add(curr_);
+                            m.addEdge(curr, curr_, act);
+                        }
+                        else{
+                            m.addEdge(curr, toOld, act);
+                        }
+                    }
+                }
+            }
+        }
+        return m;
+    }
+    
+    public Model toMDP(boolean isSpec){
+        Model m = new Model(globalVars, isSpec);
 
+        //states in m are lists of states (from processes)
+        //calculate initial state
+        ModelState init = new ModelState(m);
+        for (int j=0; j < mainProgram.getProcessDecl().size(); j++){
+            ProcessDecl pDecl = mainProgram.getProcessDecl().get(j);
+            for (int i = 0; i < process.getProcessList().size(); i++){
+                Proc proc = process.getProcessList().get(i);
+                if (pDecl.getType().equals(proc.getName())){
+                    init.getModel().getProcs().add(proc);
+                    init.getModel().getProcDecls().add(pDecl.getName());
+                    init.evalInit(proc.getInitialCond(),j);
+                }
+            }
+        }
+        
+        m.addNode(init);
+        m.setInitial(init);
+
+        TreeSet<ModelState> iterSet = new TreeSet<ModelState>();
+        iterSet.add(m.getInitial());
         //build the whole model
         while(!iterSet.isEmpty()){
             ModelState curr = iterSet.pollFirst();

@@ -314,7 +314,7 @@ def main(argv):
     probLight = 0.05
     seed = 0
     includeRewards = True
-    path = "tests/synthesis/"
+    path = "../tests/synthesis/lightRobot/"
 
 
     try:

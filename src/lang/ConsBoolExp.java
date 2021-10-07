@@ -1,7 +1,6 @@
 package lang;
 
 
-import java.util.*;
 
 /**
  * A class that represents a boolean constant, it could be true or false, represented by a 

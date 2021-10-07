@@ -1,13 +1,12 @@
 package md;
 
-import java.io.*;
 
 import lang.*;
 import core.*;
 
 
 public class MainMD {
-	   
+     
     
     public static void main(String[] args) throws InterruptedException
     {
@@ -49,7 +48,6 @@ public class MainMD {
               if (toDot)
                 md.createDot(200);
                 System.out.println("Expected Total Reward: "+md.synthesizeStrategy(precision,bound));
-                System.out.println("Expected Number of Decisions: "+md.expectedNumberOfDecisions(precision));
                 System.out.println("A strategy for the Controller has been synthesized! --> out/<filename>.strat");
             }
             catch(Exception e){

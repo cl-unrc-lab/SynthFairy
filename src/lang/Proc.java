@@ -3,10 +3,6 @@ package lang;
 
 import java.util.*;
 
-import model.*;
-
-import java.io.*;
-
 
 
 public class Proc extends ProgramNode {

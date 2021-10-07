@@ -1,8 +1,6 @@
 package lang;
 
 
-import java.util.*;
-
 /**
  * A class representing an integer constant
  */

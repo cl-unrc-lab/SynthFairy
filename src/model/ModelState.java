@@ -4,7 +4,7 @@ import java.util.*;
 import lang.*;
 
 
-public class ModelState implements Comparable{
+public class ModelState implements Comparable<Object>{
 	HashMap<String,Boolean> state; // global state bool vars
 	HashMap<String,String> stateEnums; // global state enum vars
 	HashMap<String,Integer> stateInts; // global state int vars

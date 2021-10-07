@@ -13,12 +13,14 @@ public class SimpleGameGraph{
 	private LinkedList<SimpleGameNode> nodes; // States
 	private int numNodes;
 	private int numEdges;
+	private int numTransitions;
+
 
 	public SimpleGameGraph() {
 		succList = new HashMap<SimpleGameNode, HashSet<SimpleGameNode>>();
 		preList = new HashMap<SimpleGameNode, HashSet<SimpleGameNode>>();
 		actions = new HashMap<Pair, LinkedList<Action>>();
-		numNodes = numEdges = 0;
+		numNodes = numEdges = numTransitions = 0;
 		nodes = new LinkedList<SimpleGameNode>();
 	}
 
@@ -27,6 +29,10 @@ public class SimpleGameGraph{
 	}
 
 	public int getNumEdges(){
+		return numEdges;
+	}
+
+	public int getNumTransitions(){
 		return numEdges;
 	}
 
@@ -77,6 +83,8 @@ public class SimpleGameGraph{
 			if (hasEdge(from, to, a))
 				return;
 			numEdges += 1;
+			if (!from.isProbabilistic())
+				numTransitions += 1;
 			succList.get(from).add(to);
 			preList.get(to).add(from);
 			Pair transition = new Pair(from,to);
@@ -137,7 +145,7 @@ public class SimpleGameGraph{
 		}
 		res += "\n}";
 		try{
-            File file = new File("out/" + name +".dot");
+            File file = new File("../out/" + name +".dot");
             file.createNewFile();
             FileWriter fw = new FileWriter(file);
             BufferedWriter bw = new BufferedWriter(fw);
@@ -149,4 +157,5 @@ public class SimpleGameGraph{
         }
 		return res;
 	}
+
 }

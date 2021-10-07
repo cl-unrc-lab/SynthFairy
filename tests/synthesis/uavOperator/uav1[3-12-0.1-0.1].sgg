@@ -1,0 +1,233 @@
+// Map:
+//
+// [w0-w3 danger?:True] [w0-w4 danger?:False] [w0-w9 danger?:False] [w0-w11 danger?:False] 
+// [w1-w3 danger?:True] [w1-w5 danger?:True] [w1-w6 danger?:True] [w1-w8 danger?:False] [w1-w10 danger?:True] [w1-w11 danger?:False] 
+// [w2-w3 danger?:True] [w2-w4 danger?:False] [w2-w5 danger?:False] [w2-w8 danger?:True] [w2-w9 danger?:False] [w2-w10 danger?:False] [w2-w11 danger?:True] 
+// [w3-w7 danger?:True] [w3-w8 danger?:True] [w3-w10 danger?:False] [w3-w11 danger?:False] 
+// [w4-w6 danger?:False] [w4-w7 danger?:False] [w4-w9 danger?:False] [w4-w10 danger?:False] [w4-w11 danger?:False] 
+// [w5-w7 danger?:True] [w5-w9 danger?:True] [w5-w11 danger?:False] 
+// [w6-w7 danger?:False] [w6-w9 danger?:False] [w6-w10 danger?:False] 
+// [w7-w8 danger?:True] [w7-w9 danger?:True] [w7-w10 danger?:True] [w7-w11 danger?:False] 
+// [w8-w9 danger?:True] 
+// [w9-w10 danger?:True] 
+// 
+// // Checkpoints:
+//[w2][w3][w6][w7][w10][w11]// Rewards:
+//[w0](8)[w1](1)[w2](9)[w3](8)[w4](4)[w5](6)[w6](3)[w7](4)[w8](6)[w9](4)[w10](8)[w11](4)
+
+Process UAVOperator {
+    wc : INT ;    // waypoint current, -1 : null
+
+    w0 : BOOL ;  // visited w0?
+    w1 : BOOL ;  // visited w1?
+    w2 : BOOL ;  // visited w2?
+    w3 : BOOL ;  // visited w3?
+    w4 : BOOL ;  // visited w4?
+    w5 : BOOL ;  // visited w5?
+    w6 : BOOL ;  // visited w6?
+    w7 : BOOL ;  // visited w7?
+    w8 : BOOL ;  // visited w8?
+    w9 : BOOL ;  // visited w9?
+    w10 : BOOL ;  // visited w10?
+    w11 : BOOL ;  // visited w11?
+    state: INT ; // 0:init,1:okPic,2:del,3:ndel,4:finish
+    ctrl : BOOL ;  // player turn
+
+   Rewards :
+       state==1 && !w0 && wc==0 : 8,
+       state==1 && !w1 && wc==1 : 1,
+       state==1 && !w2 && wc==2 : 9,
+       state==1 && !w3 && wc==3 : 8,
+       state==1 && !w4 && wc==4 : 4,
+       state==1 && !w5 && wc==5 : 6,
+       state==1 && !w6 && wc==6 : 3,
+       state==1 && !w7 && wc==7 : 4,
+       state==1 && !w8 && wc==8 : 6,
+       state==1 && !w9 && wc==9 : 4,
+       state==1 && !w10 && wc==10 : 8,
+       state==1 && !w11 && wc==11 : 4;
+
+   Controller : ctrl;
+   Goal : state==4;
+    // Initial State
+   Initial : wc==0 && !ctrl && state==0 && !w0 && !w1 && !w2 && !w3 && !w4 && !w5 && !w6 && !w7 && !w8 && !w9 && !w10 && !w11;
+
+    // environment moves
+
+    [loiter] !ctrl && !(wc==-1) && state == 0 -> state = 0;
+    [okPic] !ctrl && !(wc==-1) && state == 0 -> state = 1;
+    [delegate] !ctrl && state == 1 && wc == 0 -> state = 3, ctrl = true, w0 = true;
+    [delegate] !ctrl && state == 1 && wc == 1 -> state = 3, ctrl = true, w1 = true;
+    [delegate] !ctrl && state == 1 && wc == 2 -> 0.1: state = 3,ctrl = true, w2 = true ++ 0.9: state = 2, w2 = true;
+    [delegate] !ctrl && state == 1 && wc == 3 -> 0.1: state = 3,ctrl = true, w3 = true ++ 0.9: state = 2, w3 = true;
+    [delegate] !ctrl && state == 1 && wc == 4 -> state = 3, ctrl = true, w4 = true;
+    [delegate] !ctrl && state == 1 && wc == 5 -> state = 3, ctrl = true, w5 = true;
+    [delegate] !ctrl && state == 1 && wc == 6 -> 0.1: state = 3,ctrl = true, w6 = true ++ 0.9: state = 2, w6 = true;
+    [delegate] !ctrl && state == 1 && wc == 7 -> 0.1: state = 3,ctrl = true, w7 = true ++ 0.9: state = 2, w7 = true;
+    [delegate] !ctrl && state == 1 && wc == 8 -> state = 3, ctrl = true, w8 = true;
+    [delegate] !ctrl && state == 1 && wc == 9 -> state = 3, ctrl = true, w9 = true;
+    [delegate] !ctrl && state == 1 && wc == 10 -> 0.1: state = 3,ctrl = true, w10 = true ++ 0.9: state = 2, w10 = true;
+    [delegate] !ctrl && state == 1 && wc == 11 -> 0.1: state = 3,ctrl = true, w11 = true ++ 0.9: state = 2, w11 = true;
+    [fly_0_3] !ctrl && state == 2 && wc == 0 -> state = 4;
+    [fly_0_4] !ctrl && state == 2 && wc == 0 -> 0.9: state = 0, wc = 4 ++ 0.1: state = 4;
+    [fly_0_9] !ctrl && state == 2 && wc == 0 -> 0.9: state = 0, wc = 9 ++ 0.1: state = 4;
+    [fly_0_11] !ctrl && state == 2 && wc == 0 -> 0.9: state = 0, wc = 11 ++ 0.1: state = 4;
+    [fly_1_3] !ctrl && state == 2 && wc == 1 -> state = 4;
+    [fly_1_5] !ctrl && state == 2 && wc == 1 -> state = 4;
+    [fly_1_6] !ctrl && state == 2 && wc == 1 -> state = 4;
+    [fly_1_8] !ctrl && state == 2 && wc == 1 -> 0.9: state = 0, wc = 8 ++ 0.1: state = 4;
+    [fly_1_10] !ctrl && state == 2 && wc == 1 -> state = 4;
+    [fly_1_11] !ctrl && state == 2 && wc == 1 -> 0.9: state = 0, wc = 11 ++ 0.1: state = 4;
+    [fly_2_3] !ctrl && state == 2 && wc == 2 -> state = 4;
+    [fly_2_4] !ctrl && state == 2 && wc == 2 -> 0.9: state = 0, wc = 4 ++ 0.1: state = 4;
+    [fly_2_5] !ctrl && state == 2 && wc == 2 -> 0.9: state = 0, wc = 5 ++ 0.1: state = 4;
+    [fly_2_8] !ctrl && state == 2 && wc == 2 -> state = 4;
+    [fly_2_9] !ctrl && state == 2 && wc == 2 -> 0.9: state = 0, wc = 9 ++ 0.1: state = 4;
+    [fly_2_10] !ctrl && state == 2 && wc == 2 -> 0.9: state = 0, wc = 10 ++ 0.1: state = 4;
+    [fly_2_11] !ctrl && state == 2 && wc == 2 -> state = 4;
+    [fly_3_0] !ctrl && state == 2 && wc == 3 -> state = 4;
+    [fly_3_1] !ctrl && state == 2 && wc == 3 -> state = 4;
+    [fly_3_2] !ctrl && state == 2 && wc == 3 -> state = 4;
+    [fly_3_7] !ctrl && state == 2 && wc == 3 -> state = 4;
+    [fly_3_8] !ctrl && state == 2 && wc == 3 -> state = 4;
+    [fly_3_10] !ctrl && state == 2 && wc == 3 -> 0.9: state = 0, wc = 10 ++ 0.1: state = 4;
+    [fly_3_11] !ctrl && state == 2 && wc == 3 -> 0.9: state = 0, wc = 11 ++ 0.1: state = 4;
+    [fly_4_0] !ctrl && state == 2 && wc == 4 -> 0.9: state = 0, wc = 0 ++ 0.1: state = 4;
+    [fly_4_2] !ctrl && state == 2 && wc == 4 -> 0.9: state = 0, wc = 2 ++ 0.1: state = 4;
+    [fly_4_6] !ctrl && state == 2 && wc == 4 -> 0.9: state = 0, wc = 6 ++ 0.1: state = 4;
+    [fly_4_7] !ctrl && state == 2 && wc == 4 -> 0.9: state = 0, wc = 7 ++ 0.1: state = 4;
+    [fly_4_9] !ctrl && state == 2 && wc == 4 -> 0.9: state = 0, wc = 9 ++ 0.1: state = 4;
+    [fly_4_10] !ctrl && state == 2 && wc == 4 -> 0.9: state = 0, wc = 10 ++ 0.1: state = 4;
+    [fly_4_11] !ctrl && state == 2 && wc == 4 -> 0.9: state = 0, wc = 11 ++ 0.1: state = 4;
+    [fly_5_1] !ctrl && state == 2 && wc == 5 -> state = 4;
+    [fly_5_2] !ctrl && state == 2 && wc == 5 -> 0.9: state = 0, wc = 2 ++ 0.1: state = 4;
+    [fly_5_7] !ctrl && state == 2 && wc == 5 -> state = 4;
+    [fly_5_9] !ctrl && state == 2 && wc == 5 -> state = 4;
+    [fly_5_11] !ctrl && state == 2 && wc == 5 -> 0.9: state = 0, wc = 11 ++ 0.1: state = 4;
+    [fly_6_1] !ctrl && state == 2 && wc == 6 -> state = 4;
+    [fly_6_4] !ctrl && state == 2 && wc == 6 -> 0.9: state = 0, wc = 4 ++ 0.1: state = 4;
+    [fly_6_7] !ctrl && state == 2 && wc == 6 -> 0.9: state = 0, wc = 7 ++ 0.1: state = 4;
+    [fly_6_9] !ctrl && state == 2 && wc == 6 -> 0.9: state = 0, wc = 9 ++ 0.1: state = 4;
+    [fly_6_10] !ctrl && state == 2 && wc == 6 -> 0.9: state = 0, wc = 10 ++ 0.1: state = 4;
+    [fly_7_3] !ctrl && state == 2 && wc == 7 -> state = 4;
+    [fly_7_4] !ctrl && state == 2 && wc == 7 -> 0.9: state = 0, wc = 4 ++ 0.1: state = 4;
+    [fly_7_5] !ctrl && state == 2 && wc == 7 -> state = 4;
+    [fly_7_6] !ctrl && state == 2 && wc == 7 -> 0.9: state = 0, wc = 6 ++ 0.1: state = 4;
+    [fly_7_8] !ctrl && state == 2 && wc == 7 -> state = 4;
+    [fly_7_9] !ctrl && state == 2 && wc == 7 -> state = 4;
+    [fly_7_10] !ctrl && state == 2 && wc == 7 -> state = 4;
+    [fly_7_11] !ctrl && state == 2 && wc == 7 -> 0.9: state = 0, wc = 11 ++ 0.1: state = 4;
+    [fly_8_1] !ctrl && state == 2 && wc == 8 -> 0.9: state = 0, wc = 1 ++ 0.1: state = 4;
+    [fly_8_2] !ctrl && state == 2 && wc == 8 -> state = 4;
+    [fly_8_3] !ctrl && state == 2 && wc == 8 -> state = 4;
+    [fly_8_7] !ctrl && state == 2 && wc == 8 -> state = 4;
+    [fly_8_9] !ctrl && state == 2 && wc == 8 -> state = 4;
+    [fly_9_0] !ctrl && state == 2 && wc == 9 -> 0.9: state = 0, wc = 0 ++ 0.1: state = 4;
+    [fly_9_2] !ctrl && state == 2 && wc == 9 -> 0.9: state = 0, wc = 2 ++ 0.1: state = 4;
+    [fly_9_4] !ctrl && state == 2 && wc == 9 -> 0.9: state = 0, wc = 4 ++ 0.1: state = 4;
+    [fly_9_5] !ctrl && state == 2 && wc == 9 -> state = 4;
+    [fly_9_6] !ctrl && state == 2 && wc == 9 -> 0.9: state = 0, wc = 6 ++ 0.1: state = 4;
+    [fly_9_7] !ctrl && state == 2 && wc == 9 -> state = 4;
+    [fly_9_8] !ctrl && state == 2 && wc == 9 -> state = 4;
+    [fly_9_10] !ctrl && state == 2 && wc == 9 -> state = 4;
+    [fly_10_1] !ctrl && state == 2 && wc == 10 -> state = 4;
+    [fly_10_2] !ctrl && state == 2 && wc == 10 -> 0.9: state = 0, wc = 2 ++ 0.1: state = 4;
+    [fly_10_3] !ctrl && state == 2 && wc == 10 -> 0.9: state = 0, wc = 3 ++ 0.1: state = 4;
+    [fly_10_4] !ctrl && state == 2 && wc == 10 -> 0.9: state = 0, wc = 4 ++ 0.1: state = 4;
+    [fly_10_6] !ctrl && state == 2 && wc == 10 -> 0.9: state = 0, wc = 6 ++ 0.1: state = 4;
+    [fly_10_7] !ctrl && state == 2 && wc == 10 -> state = 4;
+    [fly_10_9] !ctrl && state == 2 && wc == 10 -> state = 4;
+    [fly_11_0] !ctrl && state == 2 && wc == 11 -> 0.9: state = 0, wc = 0 ++ 0.1: state = 4;
+    [fly_11_1] !ctrl && state == 2 && wc == 11 -> 0.9: state = 0, wc = 1 ++ 0.1: state = 4;
+    [fly_11_2] !ctrl && state == 2 && wc == 11 -> state = 4;
+    [fly_11_3] !ctrl && state == 2 && wc == 11 -> 0.9: state = 0, wc = 3 ++ 0.1: state = 4;
+    [fly_11_4] !ctrl && state == 2 && wc == 11 -> 0.9: state = 0, wc = 4 ++ 0.1: state = 4;
+    [fly_11_5] !ctrl && state == 2 && wc == 11 -> 0.9: state = 0, wc = 5 ++ 0.1: state = 4;
+    [fly_11_7] !ctrl && state == 2 && wc == 11 -> 0.9: state = 0, wc = 7 ++ 0.1: state = 4;
+
+    // controller moves
+
+    [fly_0_3] ctrl && state == 3 && wc == 0 -> state = 4;
+    [fly_0_4] ctrl && state == 3 && wc == 0 -> 0.9: ctrl = false, state = 0, wc = 4 ++ 0.1: ctrl = false, state = 4;
+    [fly_0_9] ctrl && state == 3 && wc == 0 -> 0.9: ctrl = false, state = 0, wc = 9 ++ 0.1: ctrl = false, state = 4;
+    [fly_0_11] ctrl && state == 3 && wc == 0 -> 0.9: ctrl = false, state = 0, wc = 11 ++ 0.1: ctrl = false, state = 4;
+    [fly_1_3] ctrl && state == 3 && wc == 1 -> state = 4;
+    [fly_1_5] ctrl && state == 3 && wc == 1 -> state = 4;
+    [fly_1_6] ctrl && state == 3 && wc == 1 -> state = 4;
+    [fly_1_8] ctrl && state == 3 && wc == 1 -> 0.9: ctrl = false, state = 0, wc = 8 ++ 0.1: ctrl = false, state = 4;
+    [fly_1_10] ctrl && state == 3 && wc == 1 -> state = 4;
+    [fly_1_11] ctrl && state == 3 && wc == 1 -> 0.9: ctrl = false, state = 0, wc = 11 ++ 0.1: ctrl = false, state = 4;
+    [fly_2_3] ctrl && state == 3 && wc == 2 -> state = 4;
+    [fly_2_4] ctrl && state == 3 && wc == 2 -> 0.9: ctrl = false, state = 0, wc = 4 ++ 0.1: ctrl = false, state = 4;
+    [fly_2_5] ctrl && state == 3 && wc == 2 -> 0.9: ctrl = false, state = 0, wc = 5 ++ 0.1: ctrl = false, state = 4;
+    [fly_2_8] ctrl && state == 3 && wc == 2 -> state = 4;
+    [fly_2_9] ctrl && state == 3 && wc == 2 -> 0.9: ctrl = false, state = 0, wc = 9 ++ 0.1: ctrl = false, state = 4;
+    [fly_2_10] ctrl && state == 3 && wc == 2 -> 0.9: ctrl = false, state = 0, wc = 10 ++ 0.1: ctrl = false, state = 4;
+    [fly_2_11] ctrl && state == 3 && wc == 2 -> state = 4;
+    [fly_3_0] ctrl && state == 3 && wc == 3 -> state = 4;
+    [fly_3_1] ctrl && state == 3 && wc == 3 -> state = 4;
+    [fly_3_2] ctrl && state == 3 && wc == 3 -> state = 4;
+    [fly_3_7] ctrl && state == 3 && wc == 3 -> state = 4;
+    [fly_3_8] ctrl && state == 3 && wc == 3 -> state = 4;
+    [fly_3_10] ctrl && state == 3 && wc == 3 -> 0.9: ctrl = false, state = 0, wc = 10 ++ 0.1: ctrl = false, state = 4;
+    [fly_3_11] ctrl && state == 3 && wc == 3 -> 0.9: ctrl = false, state = 0, wc = 11 ++ 0.1: ctrl = false, state = 4;
+    [fly_4_0] ctrl && state == 3 && wc == 4 -> 0.9: ctrl = false, state = 0, wc = 0 ++ 0.1: ctrl = false, state = 4;
+    [fly_4_2] ctrl && state == 3 && wc == 4 -> 0.9: ctrl = false, state = 0, wc = 2 ++ 0.1: ctrl = false, state = 4;
+    [fly_4_6] ctrl && state == 3 && wc == 4 -> 0.9: ctrl = false, state = 0, wc = 6 ++ 0.1: ctrl = false, state = 4;
+    [fly_4_7] ctrl && state == 3 && wc == 4 -> 0.9: ctrl = false, state = 0, wc = 7 ++ 0.1: ctrl = false, state = 4;
+    [fly_4_9] ctrl && state == 3 && wc == 4 -> 0.9: ctrl = false, state = 0, wc = 9 ++ 0.1: ctrl = false, state = 4;
+    [fly_4_10] ctrl && state == 3 && wc == 4 -> 0.9: ctrl = false, state = 0, wc = 10 ++ 0.1: ctrl = false, state = 4;
+    [fly_4_11] ctrl && state == 3 && wc == 4 -> 0.9: ctrl = false, state = 0, wc = 11 ++ 0.1: ctrl = false, state = 4;
+    [fly_5_1] ctrl && state == 3 && wc == 5 -> state = 4;
+    [fly_5_2] ctrl && state == 3 && wc == 5 -> 0.9: ctrl = false, state = 0, wc = 2 ++ 0.1: ctrl = false, state = 4;
+    [fly_5_7] ctrl && state == 3 && wc == 5 -> state = 4;
+    [fly_5_9] ctrl && state == 3 && wc == 5 -> state = 4;
+    [fly_5_11] ctrl && state == 3 && wc == 5 -> 0.9: ctrl = false, state = 0, wc = 11 ++ 0.1: ctrl = false, state = 4;
+    [fly_6_1] ctrl && state == 3 && wc == 6 -> state = 4;
+    [fly_6_4] ctrl && state == 3 && wc == 6 -> 0.9: ctrl = false, state = 0, wc = 4 ++ 0.1: ctrl = false, state = 4;
+    [fly_6_7] ctrl && state == 3 && wc == 6 -> 0.9: ctrl = false, state = 0, wc = 7 ++ 0.1: ctrl = false, state = 4;
+    [fly_6_9] ctrl && state == 3 && wc == 6 -> 0.9: ctrl = false, state = 0, wc = 9 ++ 0.1: ctrl = false, state = 4;
+    [fly_6_10] ctrl && state == 3 && wc == 6 -> 0.9: ctrl = false, state = 0, wc = 10 ++ 0.1: ctrl = false, state = 4;
+    [fly_7_3] ctrl && state == 3 && wc == 7 -> state = 4;
+    [fly_7_4] ctrl && state == 3 && wc == 7 -> 0.9: ctrl = false, state = 0, wc = 4 ++ 0.1: ctrl = false, state = 4;
+    [fly_7_5] ctrl && state == 3 && wc == 7 -> state = 4;
+    [fly_7_6] ctrl && state == 3 && wc == 7 -> 0.9: ctrl = false, state = 0, wc = 6 ++ 0.1: ctrl = false, state = 4;
+    [fly_7_8] ctrl && state == 3 && wc == 7 -> state = 4;
+    [fly_7_9] ctrl && state == 3 && wc == 7 -> state = 4;
+    [fly_7_10] ctrl && state == 3 && wc == 7 -> state = 4;
+    [fly_7_11] ctrl && state == 3 && wc == 7 -> 0.9: ctrl = false, state = 0, wc = 11 ++ 0.1: ctrl = false, state = 4;
+    [fly_8_1] ctrl && state == 3 && wc == 8 -> 0.9: ctrl = false, state = 0, wc = 1 ++ 0.1: ctrl = false, state = 4;
+    [fly_8_2] ctrl && state == 3 && wc == 8 -> state = 4;
+    [fly_8_3] ctrl && state == 3 && wc == 8 -> state = 4;
+    [fly_8_7] ctrl && state == 3 && wc == 8 -> state = 4;
+    [fly_8_9] ctrl && state == 3 && wc == 8 -> state = 4;
+    [fly_9_0] ctrl && state == 3 && wc == 9 -> 0.9: ctrl = false, state = 0, wc = 0 ++ 0.1: ctrl = false, state = 4;
+    [fly_9_2] ctrl && state == 3 && wc == 9 -> 0.9: ctrl = false, state = 0, wc = 2 ++ 0.1: ctrl = false, state = 4;
+    [fly_9_4] ctrl && state == 3 && wc == 9 -> 0.9: ctrl = false, state = 0, wc = 4 ++ 0.1: ctrl = false, state = 4;
+    [fly_9_5] ctrl && state == 3 && wc == 9 -> state = 4;
+    [fly_9_6] ctrl && state == 3 && wc == 9 -> 0.9: ctrl = false, state = 0, wc = 6 ++ 0.1: ctrl = false, state = 4;
+    [fly_9_7] ctrl && state == 3 && wc == 9 -> state = 4;
+    [fly_9_8] ctrl && state == 3 && wc == 9 -> state = 4;
+    [fly_9_10] ctrl && state == 3 && wc == 9 -> state = 4;
+    [fly_10_1] ctrl && state == 3 && wc == 10 -> state = 4;
+    [fly_10_2] ctrl && state == 3 && wc == 10 -> 0.9: ctrl = false, state = 0, wc = 2 ++ 0.1: ctrl = false, state = 4;
+    [fly_10_3] ctrl && state == 3 && wc == 10 -> 0.9: ctrl = false, state = 0, wc = 3 ++ 0.1: ctrl = false, state = 4;
+    [fly_10_4] ctrl && state == 3 && wc == 10 -> 0.9: ctrl = false, state = 0, wc = 4 ++ 0.1: ctrl = false, state = 4;
+    [fly_10_6] ctrl && state == 3 && wc == 10 -> 0.9: ctrl = false, state = 0, wc = 6 ++ 0.1: ctrl = false, state = 4;
+    [fly_10_7] ctrl && state == 3 && wc == 10 -> state = 4;
+    [fly_10_9] ctrl && state == 3 && wc == 10 -> state = 4;
+    [fly_11_0] ctrl && state == 3 && wc == 11 -> 0.9: ctrl = false, state = 0, wc = 0 ++ 0.1: ctrl = false, state = 4;
+    [fly_11_1] ctrl && state == 3 && wc == 11 -> 0.9: ctrl = false, state = 0, wc = 1 ++ 0.1: ctrl = false, state = 4;
+    [fly_11_2] ctrl && state == 3 && wc == 11 -> state = 4;
+    [fly_11_3] ctrl && state == 3 && wc == 11 -> 0.9: ctrl = false, state = 0, wc = 3 ++ 0.1: ctrl = false, state = 4;
+    [fly_11_4] ctrl && state == 3 && wc == 11 -> 0.9: ctrl = false, state = 0, wc = 4 ++ 0.1: ctrl = false, state = 4;
+    [fly_11_5] ctrl && state == 3 && wc == 11 -> 0.9: ctrl = false, state = 0, wc = 5 ++ 0.1: ctrl = false, state = 4;
+    [fly_11_7] ctrl && state == 3 && wc == 11 -> 0.9: ctrl = false, state = 0, wc = 7 ++ 0.1: ctrl = false, state = 4;
+    [finish] w0 && w1 && w2 && w3 && w4 && w5 && w6 && w7 && w8 && w9 && w10 && w11 -> state = 4;
+    [finish] state == 4 -> state = 4;
+}
+
+Main() {
+    uav : UAVOperator ;
+    run uav() ;
+}

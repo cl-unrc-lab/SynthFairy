@@ -333,6 +333,11 @@ rewardList ::= expr:e COLON INTEGER:i {: Reward r = new Reward(e,i);
                                         list.add(r);
                                         RESULT = list;
                                       :}
+            | expr:e COLON MINUS INTEGER:i {: Reward r = new Reward(e,i*(-1)); 
+                                        LinkedList<Reward> list = new LinkedList<Reward>();
+                                        list.add(r);
+                                        RESULT = list;
+                                      :}
             | rewardList:list COMMA expr:e COLON INTEGER:i {: Reward r = new Reward(e,i); 
                                                             list.add(r);
                                                             RESULT = list;
