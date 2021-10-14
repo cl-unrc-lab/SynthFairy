@@ -123,7 +123,6 @@ public class StrategySynthesis{
       do {
           i++;
           for (SimpleGameNode v : g.getNodes()) {
-              //System.out.println(v.getValues()[1]);
               v.setValue(0,v.getValues()[1]);
           }
           for (SimpleGameNode v : g.getNodes()) {
@@ -163,7 +162,7 @@ public class StrategySynthesis{
       return init.getValues()[1];
   }
   
-  private boolean stopingCriterion(int precision) {
+  /*private boolean stopingCriterion(int precision) {
       for (SimpleGameNode v : g.getNodes()){
           try{
             double epsilon = (Math.abs(v.getValues()[1]-v.getValues()[0]))/v.getValues()[1];
@@ -176,6 +175,35 @@ public class StrategySynthesis{
            }
       }
     return true;
+  }*/
+
+  private boolean stopingCriterion(int precision) {
+      String decimalFormat = "#.";
+      double diff = 0;
+      String eFormat = "";
+      double e = 0;
+      for (int i = 0; i < precision; i++){
+        decimalFormat += "#";
+        eFormat += i==0?"0.":"0";
+      }
+      eFormat += "1";
+      e = Double.parseDouble(eFormat);
+      DecimalFormat newFormat = new DecimalFormat(decimalFormat);
+      for (SimpleGameNode v : g.getNodes()){
+          try{
+              double val = v.getValues()[1]>e?v.getValues()[1]:e;
+              diff = (v.getValues()[0]-v.getValues()[1])/val;
+              diff = Double.valueOf(newFormat.format(diff));
+             if (diff > e) {
+                 return false;
+             }
+           }
+           catch (NumberFormatException ex){
+              System.out.println("ERROR: Number Format Exception");
+              System.out.println("Node "+v+" has value: "+v.getValues()[0]);
+           }
+      }
+      return true;
   }
 
   private boolean stopingCriterion2(int precision) {

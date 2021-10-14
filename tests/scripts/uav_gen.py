@@ -245,7 +245,7 @@ def main(argv):
     probDel = 0.1
     probAcc = 0.05
     seed = 0
-    path = "../synthesis/uavOperator/"
+    path = "../tests/synthesis/uavOperator/"
 
 
     try:

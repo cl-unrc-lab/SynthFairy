@@ -24,10 +24,6 @@ def genBoardEx() :
     checkpoints = [0,1,0,0,1,1]
     rewards = [1,1,1,1,1,1]
 
-def changeRewards() :
-    global rewards
-    rewards = [1,3,1,1,1,4]
-
 def writePreamble(mFile) :
 
     # a depiction of the board as a comment
@@ -157,7 +153,7 @@ def main(argv):
     probDel = 0.5
     probAcc = 0.3
     seed = 0
-    path = "../synthesis/uavOperator/"
+    path = "../tests/synthesis/uavOperator/"
 
 
     try:
@@ -206,8 +202,9 @@ def main(argv):
 
     genBoardEx()
     writeUAV_1(path+"uavEX.sgg")
-    changeRewards()
+    rewards = [1,3,1,1,1,4]
     writeUAV_1(path+"uavEX2.sgg")
-
+    rewards = [1,3,1,1,2,4]
+    writeUAV_1(path+"uavEX3.sgg")
 
 main(sys.argv[1:])
